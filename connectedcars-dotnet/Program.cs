@@ -13,8 +13,10 @@ namespace connectedcars_dotnet
         {
             log.LogToConsole("Hello World!");
 
-            string AuthJson = apiWrk.GetAuth();
-            log.LogToConsole(AuthJson);
+            var AuthJson = apiWrk.GetAuth();
+            //log.LogToConsole(AuthJson.token);
+            var VehicleOverview = apiWrk.GetVehicleOverview(AuthJson.token);
+            log.LogToConsole(VehicleOverview);
         }
     }
 }
