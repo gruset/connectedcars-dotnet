@@ -2,13 +2,19 @@
 using System.Collections.Generic;
 using System.Text;
 
+using Newtonsoft.Json;
+
 namespace connectedcars_dotnet.Models
 {
     public class AuthTokenModel
     {
-        public string oldToken { get; set; }
-        public string token { get; set; }
-        public string level { get; set; }
-        public int expires { get; set; }
+        [JsonProperty("oldToken")]
+        public string OldToken { get; set; }
+        [JsonProperty("Token")]
+        public string Token { get; set; }
+        [JsonProperty("level")]
+        public string Level { get; set; }
+        [JsonProperty("expires")]
+        public int Expires { get; set; }
     }
 }

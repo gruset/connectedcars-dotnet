@@ -5,10 +5,13 @@ using System.Text;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using connectedcars_dotnet.Helpers;
 using connectedcars_dotnet.Models;
 using System.Net.Http.Headers;
 using System.Net;
+using System.IO;
+
 
 namespace connectedcars_dotnet.Workers
 {
@@ -60,9 +63,14 @@ namespace connectedcars_dotnet.Workers
                 Content = data
             };
 
-            string jsonVehicleOverview = "{ \"query\": \"query User { viewer { vehicles { vehicle { id licensePlate                unitSerial make                model name                fuelEconomy health { ok recommendation                } ignition { time on                } odometer { time odometer                } fuelLevel { time liter                } position { time latitude                    longitude                 } } } } \"}";
+            string queryVehicleOverview = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + @"Models/connectedcars-VehicleOverview.txt"); 
 
-            var dataVehicleOverview = new StringContent(jsonVehicleOverview, Encoding.UTF8, "application/json");
+            var objVehicleOverview = JObject.FromObject(new
+            {
+                query = queryVehicleOverview
+            });
+
+            var dataVehicleOverview = new StringContent(objVehicleOverview.ToString(), Encoding.UTF8, "application/json");
 
             var request_data = new HttpRequestMessage
             {

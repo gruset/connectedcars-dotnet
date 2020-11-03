@@ -12,7 +12,7 @@ namespace connectedcars_dotnet.Helpers
     {
         public ConfigModel Configuration()
         {
-            String jsonConfig = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + @"\config.json");
+            String jsonConfig = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + @"config.json");
             return JsonConvert.DeserializeObject<ConfigModel>(jsonConfig);
         }
     }
