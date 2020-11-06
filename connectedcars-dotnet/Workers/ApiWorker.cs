@@ -1,46 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 
-using System.Net.Http;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using connectedcars_dotnet.Helpers;
 using connectedcars_dotnet.Models;
-using System.Net.Http.Headers;
-using System.Net;
-using System.IO;
 
 
 namespace connectedcars_dotnet.Workers
 {
     class ApiWorker
     {
-        private ConfigModel config = new Config().Configuration();
         Log log = new Log();
 
-        public AuthTokenModel GetAuth()
+        public AuthTokenModel GetAuth(Account account)
         {
-            string result = ApiPost(config.Email, config.Password, config.Namespace, "auth");
+            string result = ApiPost(account, "auth");
             var res = JsonConvert.DeserializeObject<AuthTokenModel>(result);
 
             return res;
         }
 
-        public string GetVehicleOverview(string _token)
+        public string GetVehicleOverview(Account account, string _token)
         {
-            string result = ApiPost(config.Email, config.Password, config.Namespace, "VehicleOverview", _token);
+            string result = ApiPost(account, "VehicleOverview", _token);
             return result;
         }
 
-        private string ApiPost (string _email, string _password, string _namespace, string _function, string _token = "")
+        private string ApiPost (Account account, string _function, string _token = "")
         {
             string result = "";
 
             var user = new User();
-            user.email = _email;
-            user.password = _password;
+            user.email = account.Email;
+            user.password = account.Password;
 
             var json = JsonConvert.SerializeObject(user);
             var data = new StringContent(json, Encoding.UTF8, "application/json");
@@ -58,7 +54,7 @@ namespace connectedcars_dotnet.Workers
                 {
                     { HttpRequestHeader.ContentType.ToString(), "application/json" },
                     { HttpRequestHeader.Accept.ToString(), "application/json" },
-                    { "x-organization-namespace", _namespace }
+                    { "x-organization-namespace", account.Namespace }
                 },
                 Content = data
             };
@@ -80,13 +76,12 @@ namespace connectedcars_dotnet.Workers
                 {
                     { HttpRequestHeader.ContentType.ToString(), "application/json" },
                     { HttpRequestHeader.Accept.ToString(), "application/json" },
-                    { "x-organization-namespace", _namespace },
+                    { "x-organization-namespace", account.Namespace },
                     { HttpRequestHeader.Authorization.ToString(), $"Bearer { _token }" }
                 },
                 Content = dataVehicleOverview
             };
 
-            //log.LogToConsole(request.Content.ReadAsStringAsync().Result);
             if (_function == "auth")
             {
                 HttpResponseMessage response = client.SendAsync(request_auth).Result;
@@ -97,9 +92,6 @@ namespace connectedcars_dotnet.Workers
                 HttpResponseMessage response = client.SendAsync(request_data).Result;
                 result = response.Content.ReadAsStringAsync().Result;
             }
-            
-            //var response = await client.PostAsync(auth_url, data);
-            //string result = response.Content.ReadAsStringAsync().Result;
 
             return result;
         }
