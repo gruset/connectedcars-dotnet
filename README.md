@@ -10,12 +10,14 @@ Add your accounts in "config.json" file. The current example holds an array with
     {
       "Email": "email@email.com",
       "Password": "password",
-      "Namespace": "semler:minskoda"
+      "Namespace": "semler:minskoda",
+      "Id": 1
     },
     {
       "Email": "email@email.com",
       "Password": "password",
-      "Namespace": "semler:minvolkswagen"
+      "Namespace": "semler:minvolkswagen",
+      "Id": 2
     }
   ]
 }
@@ -27,7 +29,8 @@ Adapt the array to your needs. Should you only have one account, leave only one 
     {
       "Email": "email@email.com",
       "Password": "password",
-      "Namespace": "semler:minskoda"
+      "Namespace": "semler:minskoda",
+      "Id": 1
     }
   ]
 }
