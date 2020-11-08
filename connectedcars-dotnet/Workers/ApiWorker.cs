@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -30,13 +29,21 @@ namespace connectedcars_dotnet.Workers
             return result;
         }
 
+        public string GetVehicleTrips(Account account, string _token)
+        {
+            string result = ApiPost(account, "VehicleTrips", _token);
+            return result;
+        }
+
         private string ApiPost (Account account, string _function, string _token = "")
         {
             string result = "";
 
-            var user = new User();
-            user.email = account.Email;
-            user.password = account.Password;
+            var user = JObject.FromObject(new
+            {
+                email = account.Email,
+                password = account.Password
+            });
 
             var json = JsonConvert.SerializeObject(user);
             var data = new StringContent(json, Encoding.UTF8, "application/json");
@@ -59,16 +66,22 @@ namespace connectedcars_dotnet.Workers
                 Content = data
             };
 
-            string queryVehicleOverview = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + @"Models/connectedcars-VehicleOverview.txt"); 
+            Queries q = new Queries(); // initiate a new instance of Queries to acces the predefined queries.
 
             var objVehicleOverview = JObject.FromObject(new
             {
-                query = queryVehicleOverview
+                query = q.VehicleOverview()
+            });
+
+            var objVehicleTrips = JObject.FromObject(new
+            {
+                query = q.VehicleTrips()
             });
 
             var dataVehicleOverview = new StringContent(objVehicleOverview.ToString(), Encoding.UTF8, "application/json");
+            var dataVehicleTrips = new StringContent(objVehicleTrips.ToString(), Encoding.UTF8, "application/json");
 
-            var request_data = new HttpRequestMessage
+            var request_vehicleOverview = new HttpRequestMessage
             {
                 RequestUri = new Uri(data_url),
                 Method = HttpMethod.Post,
@@ -82,6 +95,20 @@ namespace connectedcars_dotnet.Workers
                 Content = dataVehicleOverview
             };
 
+            var request_vehicleTrips = new HttpRequestMessage
+            {
+                RequestUri = new Uri(data_url),
+                Method = HttpMethod.Post,
+                Headers =
+                {
+                    { HttpRequestHeader.ContentType.ToString(), "application/json" },
+                    { HttpRequestHeader.Accept.ToString(), "application/json" },
+                    { "x-organization-namespace", account.Namespace },
+                    { HttpRequestHeader.Authorization.ToString(), $"Bearer { _token }" }
+                },
+                Content = dataVehicleTrips
+            };
+
             if (_function == "auth")
             {
                 HttpResponseMessage response = client.SendAsync(request_auth).Result;
@@ -89,16 +116,16 @@ namespace connectedcars_dotnet.Workers
             }
             else if (_function == "VehicleOverview")
             {
-                HttpResponseMessage response = client.SendAsync(request_data).Result;
+                HttpResponseMessage response = client.SendAsync(request_vehicleOverview).Result;
+                result = response.Content.ReadAsStringAsync().Result;
+            }
+            else if (_function == "VehicleTrips")
+            {
+                HttpResponseMessage response = client.SendAsync(request_vehicleTrips).Result;
                 result = response.Content.ReadAsStringAsync().Result;
             }
 
             return result;
-        }
-        private class User
-        {
-            public string email { get; set; }
-            public string password { get; set; }
         }
     }
 }

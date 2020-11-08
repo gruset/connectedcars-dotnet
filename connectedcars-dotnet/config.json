@@ -3,12 +3,14 @@
     {
       "Email": "email@email.com",
       "Password": "password",
-      "Namespace": "semler:minskoda"
+      "Namespace": "semler:minskoda",
+      "Id": 1
     },
     {
       "Email": "email@email.com",
       "Password": "password",
-      "Namespace": "semler:minvolkswagen"
+      "Namespace": "semler:minvolkswagen",
+      "Id": 2
     }
   ]
 }
